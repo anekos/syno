@@ -5,7 +5,7 @@ load './lib/syno.rb'
 
 command = ARGV.shift.to_sym
 
-selected = {
+defs = {
   :pause => 0,
   :stop => 0,
   :play => 0..1,
@@ -13,7 +13,9 @@ selected = {
   :prev => 0,
   :repeat => %w[all one two],
   :shuffle => %w[true false],
-}[command]
+}
+
+selected = defs[command]
 
 
 valid =
@@ -30,6 +32,7 @@ valid =
 
 unless valid
   STDERR.puts('Invalid arguments')
+  STDERR.puts(defs)
   exit 1
 end
 
