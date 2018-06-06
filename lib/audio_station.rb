@@ -48,11 +48,11 @@ class AudioStation
     control(action: 'prev')
   end
 
-  def set_repeat(value) # all / one / none
+  def repeat(value) # all / one / none
     control(action: 'set_repeat', value: value)
   end
 
-  def set_shuffle(value) # true / false
+  def shuffle(value) # true / false
     control(action: 'set_shuffle', value: value)
   end
 
