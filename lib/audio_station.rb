@@ -27,4 +27,47 @@ class AudioStation
       :SynoToken => @session.token
     )
   end
+
+  def pause
+    control(action: 'pause')
+  end
+
+  def stop
+    control(action: 'stop')
+  end
+
+  def play(value = nil)
+    control(action: 'play', value: value)
+  end
+
+  def next
+    control(action: 'next')
+  end
+
+  def prev
+    control(action: 'prev')
+  end
+
+  def set_repeat(value) # all / one / none
+    control(action: 'set_repeat', value: value)
+  end
+
+  def set_shuffle(value) # true / false
+    control(action: 'set_shuffle', value: value)
+  end
+
+  def control(action:, value: nil)
+    API.new(
+      name: 'AudioStation',
+      cgi: 'remote_player',
+      api: 'SYNO.AudioStation.RemotePlayer',
+      version: 3,
+      method: 'control',
+      token: @session.token
+    ).post(
+      :id => '__SYNO_USB_PLAYER__',
+      :action => action,
+      :value => value,
+    )
+  end
 end

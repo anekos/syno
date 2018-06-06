@@ -39,7 +39,6 @@ Syno.new do
       previous = current
     end
 
-
     sleep 1.5
   end
 end
