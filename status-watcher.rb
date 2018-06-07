@@ -21,13 +21,19 @@ Syno.new do
     status = syno.audio_station.status
 
     song = status.dig('data', 'song')
-    additional = song.dig('additional', 'song_tag')
 
-    current = {
-      :album =>  additional.dig('album'),
-      :artist => additional.dig('album_artist'),
-      :title => song.dig('title'),
-    }
+    current =
+      if song and additional = song.dig('additional', 'song_tag')
+        {
+          :album =>  additional.dig('album'),
+          :artist => additional.dig('album_artist'),
+          :title => song.dig('title'),
+        }
+      else
+        {
+          :album => '-', :artist => '-', :title => '-'
+        }
+      end
 
     unless current == previous
       cmd = command_line.map do

@@ -45,7 +45,7 @@ class API
 
     JSON.parse(response.body_str).tap do
       |result|
-      raise 'API Failed' unless result['success']
+      raise "API Failed: #{result}" unless result['success']
     end
   end
 
