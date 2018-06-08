@@ -3,11 +3,13 @@
 
 # Usage
 
+## audio-station
+
 ```
 audio-station.rb <COMMAND>
 ```
 
-## Commands
+Commands
 
 - pause
 - stop
@@ -23,6 +25,12 @@ audio-station.rb <COMMAND>
 - update_playlist <PLAYLIST_NAME>
 - update_playlist_with_directory <DIRECTORY_ID>
 
+
+## status-watcher (for Audio Station)
+
+```
+status-watcher.rb <UPDATE_COMMAND> '%artist% - %title% - %album%'
+```
 
 # Config
 
