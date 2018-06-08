@@ -1,15 +1,13 @@
 #!/usr/bin/ruby
 # vim: set fileencoding=utf-8 :
 
+# Libs {{{
 require 'yaml'
 require 'readline'
-
 load './lib/syno.rb'
+# }}}
 
-
-Blank = '▫'
-
-
+# Commmand class {{{
 class Command
   @@table = {}
 
@@ -17,32 +15,42 @@ class Command
     @@table[name]
   end
 
-  def initialize (name, meta, &block)
+  def check_result(result)
+    raise 'API Failed' unless result['success']
+    result['data']
+  end
+
+  def register(name)
     if Array === name
       name.each {|it| @@table[it] = self }
       name = name.first
     else
       @@table[name] = self
     end
+  end
+end
+
+class SimpleCommand < Command
+  def initialize (name, meta, &block)
+    register(name)
     @name = name
     @meta = meta
     @after = block
+  end
+
+  def override_run(&block)
+    @overrode_run = block
   end
 
   def run(syno, args)
     validate(args)
 
     result = syno.audio_station.__send__(@name, *args)
-
-    if result['success']
-      data = result['data']
-      if @after
-        @after.call(data)
-      else
-        puts(data.to_yaml) if data and !data.empty?
-      end
+    data = check_result(result)
+    if @after
+      @after.call(data)
     else
-      raise 'API Failed'
+      puts(data.to_yaml) if data and !data.empty?
     end
   end
 
@@ -59,14 +67,23 @@ class Command
     end or raise 'Invalid arguments'
   end
 end
+# }}}
 
+# Commands {{{
+Blank = '▫'
 
+SimpleCommand.new(:next, 0)
+SimpleCommand.new(:pause, 0)
+SimpleCommand.new(:pins, 0)
+SimpleCommand.new(:prev , 0)
+SimpleCommand.new(:repeat , %w[all one two])
+SimpleCommand.new(:shuffle , %w[true false])
+SimpleCommand.new(:status , 0)
+SimpleCommand.new(:stop , 0)
+SimpleCommand.new(:toggle , 0)
+SimpleCommand.new(:update_playlist , 1)
 
-Command.new(:next, 0)
-Command.new(:pause, 0)
-Command.new(:pins, 0)
-Command.new(:play, 0..1)
-Command.new([:playlist, :pl], 0..1) do
+SimpleCommand.new([:playlist, :pl], 0..1) do
   |data|
   songs = data['songs']
   current = data['current']
@@ -86,7 +103,8 @@ Command.new([:playlist, :pl], 0..1) do
   end
   # puts(data.to_yaml)
 end
-Command.new([:playlists, :pls], 0) do
+
+SimpleCommand.new([:playlists, :pls], 0) do
   |data|
   data['playlists'].each do
     |playlist|
@@ -94,16 +112,17 @@ Command.new([:playlists, :pls], 0) do
     puts playlist['name']
   end
 end
-Command.new(:prev , 0)
-Command.new(:repeat , %w[all one two])
-Command.new(:shuffle , %w[true false])
-Command.new(:status , 0)
-Command.new(:stop , 0)
-Command.new(:toggle , 0)
-Command.new(:update_playlist , 1)
 
+class PlayCommand < Command
+  def run(syno, args)
+    index = *args
+    index = index.to_i - 1 if index
+    check_result(syno.audio_station.play(index))
+  end
+end
+# }}}
 
-
+# App {{{
 class App
   def initialize(syno)
     @syno = syno
@@ -119,8 +138,9 @@ class App
     end
   end
 end
+# }}}
 
-
+# Main {{{
 Syno.new do
   |syno|
   app = App.new(syno)
@@ -138,3 +158,4 @@ Syno.new do
     app.request(ARGV.dup)
   end
 end
+# }}}
