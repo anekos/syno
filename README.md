@@ -1,10 +1,33 @@
 
 # Synology DSM
 
+# Usage
+
+```
+audio-station.rb <COMMAND>
+```
+
+## Commands
+
+- pause
+- stop
+- play [<INDEX>]
+- next
+- prev
+- repeat [all|one|two],
+- shuffle [true|false],
+- status
+- pins
+- playlists
+- playlist [<OFFSET>]
+- update_playlist <PLAYLIST_NAME>
+- update_playlist_with_directory <DIRECTORY_ID>
 
 
+# Config
 
-# Place `.env`
+Place `.env` file in the same directory as this project.
+Or set environment variables.
 
 ```
 SYNO_USERNAME=XXXXXX
