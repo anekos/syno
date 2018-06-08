@@ -26,7 +26,7 @@ Syno.new do
       if song and additional = song.dig('additional', 'song_tag')
         {
           :album =>  additional.dig('album'),
-          :artist => additional.dig('album_artist'),
+          :artist => additional.dig('artist') || additional.dig('album_artist'),
           :title => song.dig('title'),
         }
       else

@@ -19,6 +19,7 @@ CommandArgs = {
   :playlists => 0,
   :playlist => 0..1,
   :update_playlist => 1,
+  :update_playlist_with_directory => 1,
 }
 
 
