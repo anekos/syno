@@ -120,6 +120,16 @@ class AudioStation
     )
   end
 
+  def toggle
+    current = self.status
+    case current.dig('data', 'state')
+    when 'playing'
+      self.pause
+    when 'pause', 'none'
+      self.play
+    end
+  end
+
   def pins
     API.new(
       cgi: 'entry',

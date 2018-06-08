@@ -11,17 +11,18 @@ audio-station.rb <COMMAND>
 
 Commands
 
-- pause
-- stop
-- play [&lt;INDEX&gt;]
 - next
+- pause
+- pins
+- play [&lt;INDEX&gt;]
+- playlist [&lt;OFFSET&gt;]
+- playlists
 - prev
 - repeat [all|one|two],
 - shuffle [true|false],
 - status
-- pins
-- playlists
-- playlist [&lt;OFFSET&gt;]
+- stop
+- toggle
 - update_playlist &lt;PLAYLIST_NAME&gt;
 - update_playlist_with_directory &lt;DIRECTORY_ID&gt;
 

@@ -7,17 +7,18 @@ require 'readline'
 load './lib/syno.rb'
 
 CommandArgs = {
-  :pause => 0,
-  :stop => 0,
-  :play => 0..1,
   :next => 0,
+  :pause => 0,
+  :pins => 0,
+  :play => 0..1,
+  :playlist => 0..1,
+  :playlists => 0,
   :prev => 0,
   :repeat => %w[all one two],
   :shuffle => %w[true false],
   :status => 0,
-  :pins => 0,
-  :playlists => 0,
-  :playlist => 0..1,
+  :stop => 0,
+  :toggle => 0,
   :update_playlist => 1,
   :update_playlist_with_directory => 1,
 }
