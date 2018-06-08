@@ -13,7 +13,7 @@ Commands
 
 - pause
 - stop
-- play [<INDEX>]
+- play [&lt;INDEX&gt;]
 - next
 - prev
 - repeat [all|one|two],
@@ -21,9 +21,9 @@ Commands
 - status
 - pins
 - playlists
-- playlist [<OFFSET>]
-- update_playlist <PLAYLIST_NAME>
-- update_playlist_with_directory <DIRECTORY_ID>
+- playlist [&lt;OFFSET&gt;]
+- update_playlist &lt;PLAYLIST_NAME&gt;
+- update_playlist_with_directory &lt;DIRECTORY_ID&gt;
 
 
 ## status-watcher (for Audio Station)
