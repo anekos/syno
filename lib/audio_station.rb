@@ -2,10 +2,6 @@
 
 
 class AudioStation
-  def initialize (session)
-    @session = session
-  end
-
   def update_playlist(name)
     API.new(
       name: 'AudioStation',
@@ -13,7 +9,7 @@ class AudioStation
       api: 'SYNO.AudioStation.RemotePlayer',
       version: 3,
       method: 'updateplaylist',
-      token: @session.token
+      token: true
     ).post(
       :id => '__SYNO_USB_PLAYER__',
       :keep_shuffle_order => false,
@@ -32,7 +28,7 @@ class AudioStation
       api: 'SYNO.AudioStation.RemotePlayer',
       version: 3,
       method: 'updateplaylist',
-      token: @session.token
+      token: true
     ).post(
       :id => '__SYNO_USB_PLAYER__',
       :keep_shuffle_order => false,
@@ -51,7 +47,7 @@ class AudioStation
       api: 'SYNO.AudioStation.Playlist',
       version: 3,
       method: 'list',
-      token: @session.token
+      token: true
     ).post(
       :library => 'all',
       :limit => 100000,
@@ -68,11 +64,11 @@ class AudioStation
       cgi: 'remote_player_status',
       api: 'SYNO.AudioStation.RemotePlayerStatus',
       version: 1,
-      method: 'getstatus'
+      method: 'getstatus',
+      token: true,
     ).get(
       :id => '__SYNO_USB_PLAYER__',
       :additional => 'song_tag,song_audio,subplayer_volume,song_rating',
-      :SynoToken => @session.token
     )
   end
 
@@ -111,7 +107,7 @@ class AudioStation
       api: 'SYNO.AudioStation.RemotePlayer',
       version: 3,
       method: 'getplaylist',
-      token: @session.token
+      token: true,
     ).post(
       :id => '__SYNO_USB_PLAYER__',
       :offset => offset,
@@ -136,7 +132,7 @@ class AudioStation
       api: 'SYNO.AudioStation.Pin',
       version: 1,
       method: 'list',
-      token: @session.token
+      token: true,
     ).post(
       :offset => 0,
       :limit => -1,
@@ -150,7 +146,7 @@ class AudioStation
       api: 'SYNO.AudioStation.RemotePlayer',
       version: 3,
       method: 'control',
-      token: @session.token
+      token: true,
     ).post(
       :id => '__SYNO_USB_PLAYER__',
       :action => action,
