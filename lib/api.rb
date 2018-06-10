@@ -49,6 +49,8 @@ class API
       return
     end
 
+    # STDERR.puts('<Login>')
+
     result = API.new(
       cgi: 'auth',
       api: 'SYNO.API.Auth',

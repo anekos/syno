@@ -18,7 +18,12 @@ class Command
   end
 
   def initialize (name, meta, &block)
-    @@table[name] = self
+    if Array === name
+      name.each {|it| @@table[it] = self }
+      name = name.first
+    else
+      @@table[name] = self
+    end
     @name = name
     @meta = meta
     @after = block
@@ -53,16 +58,15 @@ class Command
       true
     end or raise 'Invalid arguments'
   end
-
 end
 
 
 
 Command.new(:next, 0)
-Command.new(:pause , 0)
-Command.new(:pins , 0)
-Command.new(:play , 0..1)
-Command.new(:playlist , 0..1) do
+Command.new(:pause, 0)
+Command.new(:pins, 0)
+Command.new(:play, 0..1)
+Command.new([:playlist, :pl], 0..1) do
   |data|
   songs = data['songs']
   current = data['current']
@@ -82,7 +86,7 @@ Command.new(:playlist , 0..1) do
   end
   # puts(data.to_yaml)
 end
-Command.new(:playlists , 0) do
+Command.new([:playlists, :pls], 0) do
   |data|
   data['playlists'].each do
     |playlist|
