@@ -6,22 +6,98 @@ require 'readline'
 
 load './lib/syno.rb'
 
-CommandArgs = {
-  :next => 0,
-  :pause => 0,
-  :pins => 0,
-  :play => 0..1,
-  :playlist => 0..1,
-  :playlists => 0,
-  :prev => 0,
-  :repeat => %w[all one two],
-  :shuffle => %w[true false],
-  :status => 0,
-  :stop => 0,
-  :toggle => 0,
-  :update_playlist => 1,
-  :update_playlist_with_directory => 1,
-}
+
+Blank = '▫'
+
+
+class Command
+  @@table = {}
+
+  def self.matched(name)
+    @@table[name]
+  end
+
+  def initialize (name, meta, &block)
+    @@table[name] = self
+    @name = name
+    @meta = meta
+    @after = block
+  end
+
+  def run(syno, args)
+    validate(args)
+
+    result = syno.audio_station.__send__(@name, *args)
+
+    if result['success']
+      data = result['data']
+      if @after
+        @after.call(data)
+      else
+        puts(data.to_yaml) if data and !data.empty?
+      end
+    else
+      raise 'API Failed'
+    end
+  end
+
+  private def validate(args)
+    case @meta
+    when Range
+      @meta.include?(args.size)
+    when Integer
+      args.size == @meta
+    when Array
+      @meta.include?(args.first)
+    else
+      true
+    end or raise 'Invalid arguments'
+  end
+
+end
+
+
+
+Command.new(:next, 0)
+Command.new(:pause , 0)
+Command.new(:pins , 0)
+Command.new(:play , 0..1)
+Command.new(:playlist , 0..1) do
+  |data|
+  songs = data['songs']
+  current = data['current']
+  digits = Math.log(songs.size, 10).to_i + 1
+  songs.each_with_index do |song, i|
+    a = song['additional']
+    mark = i == current ? '→' : ''
+    parts = ["%#{digits}s %2.d %s" % [mark, i + 1, song['title']]]
+    if a and tag = a['song_tag']
+      parts << tag['artist'] || tag('album_artist') || Blank
+      parts << tag['album'] || Blank
+    end
+    if a and rating = a.dig('song_rating', 'rating')
+      parts << ' ★' * rating.to_i
+    end
+    puts(parts.join(' ／ '))
+  end
+  # puts(data.to_yaml)
+end
+Command.new(:playlists , 0) do
+  |data|
+  data['playlists'].each do
+    |playlist|
+      next if playlist['id'] === 'playlist_personal_normal/__SYNO_AUDIO_SHARED_SONGS__'
+    puts playlist['name']
+  end
+end
+Command.new(:prev , 0)
+Command.new(:repeat , %w[all one two])
+Command.new(:shuffle , %w[true false])
+Command.new(:status , 0)
+Command.new(:stop , 0)
+Command.new(:toggle , 0)
+Command.new(:update_playlist , 1)
+
 
 
 class App
@@ -30,37 +106,15 @@ class App
   end
 
   def request(args)
-    command = args.shift.to_sym
+    command_name = args.shift.to_sym
 
-    selected = CommandArgs[command]
-
-    valid =
-      case selected
-      when Range
-        selected.include?(args.size)
-      when Integer
-        args.size == selected
-      when Array
-        selected.include?(args.first)
-      else
-        true
-      end
-
-    raise 'Invalid arguments' unless valid
-
-    result = @syno.audio_station.__send__(command, *args)
-
-    if result['success']
-      data = result['data']
-      puts(data.to_yaml) if data and !data.empty?
-      # puts(JSON.pretty_generate(result['data']))
+    if command = Command.matched(command_name)
+      command.run(@syno, args)
     else
-      raise 'API Failed'
+      raise 'Invalid command'
     end
   end
 end
-
-
 
 
 Syno.new do
