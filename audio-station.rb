@@ -27,10 +27,15 @@ class Command
 
   def initialize (name, meta, help: nil, &block)
     register(name)
-    @name = name
+    if Array === name
+      @name = name.first
+      @help = help || name.join('|')
+    else
+      @name = name
+      @help = help || name
+    end
     @meta = meta
     @main = block
-    @help = help || (Array === name ? name.join('|') : name)
   end
 
   def check_result(result)
@@ -126,6 +131,44 @@ AliasCommand.new([:playlists, :pls], 0) do
     puts playlist['name']
   end
 end
+
+AliasCommand.new([:search, :find], 1) do
+  |data|
+  puts('Albums:')
+
+  data['albums'].each_with_index do
+    |album, i|
+    puts('  %d - %s ／ %s' % [i + 1, album['album_artist'], album['name']])
+  end
+
+  puts('Artists:')
+
+  data['artists'].each_with_index do
+    |artist, i|
+    puts('  %d - %s' % [i + 1, artist['name']])
+  end
+
+  puts('Songs:')
+
+  data['songs'].each_with_index do
+    |song, i|
+    tag = song.dig('additional', 'song_tag')
+    args = [
+      i + 1,
+      song['title'],
+      tag['artist'],
+      tag['album'],
+      song['id'].sub(/\D+_/, '').to_i
+    ]
+    puts('  %d - %s ／ %s ／ %s (%d)' % args)
+  end
+end
+
+AliasCommand.new([:playlist_add, :pa], 1..2)
+
+AliasCommand.new([:playlist_add_album, :album, :al], 1)
+AliasCommand.new([:playlist_add_artist, :artist, :ar], 1)
+AliasCommand.new([:playlist_add_song, :song, :so], 1)
 
 StandardCommand.new(:play, 0..1, help: 'play [<TRACK_NUMBER>]') do
   |this, syno, index|
