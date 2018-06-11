@@ -91,7 +91,6 @@ class AudioStation
     end
 
     params[:containers_json] = params[:containers_json].to_json
-    p params
 
     API.new(
       name: 'AudioStation',
@@ -102,6 +101,7 @@ class AudioStation
       token: true,
     ).post(params)
   end
+
   def playlist_add_song(value)
     value = "music_#{value}" if /\A\d+\z/ === value
 
