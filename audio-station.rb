@@ -166,6 +166,26 @@ end
 
 AliasCommand.new([:playlist_add, :pa], 1..2)
 
+StandardCommand.new([:playlist_add_from_search_result, :pa], 1..10000) do
+  |this, syno, *lines|
+  lines.map do
+    |line|
+    line = line.dup
+    next unless line.sub!(/\A\s+\d+ - /, '')
+
+    a, b, c = line.split(/ *／ */)
+    if c
+      if m = c.match(%r[\((\d+)\)])
+        syno.audio_station.playlist_add(m[1])
+      end
+    elsif b
+      syno.audio_station.playlist_add(a, b)
+    elsif a
+      syno.audio_station.playlist_add(a)
+    end
+  end
+end
+
 AliasCommand.new([:playlist_add_album, :album, :al], 1)
 AliasCommand.new([:playlist_add_artist, :artist, :ar], 1)
 AliasCommand.new([:playlist_add_song, :song, :so], 1)

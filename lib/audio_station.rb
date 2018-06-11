@@ -103,7 +103,7 @@ class AudioStation
   end
 
   def playlist_add_song(value)
-    value = "music_#{value}" if /\A\d+\z/ === value
+    value = "music_#{value}" if Integer === value or /\A\d+\z/ === value
 
     API.new(
       name: 'AudioStation',
@@ -209,7 +209,7 @@ class AudioStation
     ).post(
       :id => '__SYNO_USB_PLAYER__',
       :additional => 'song_tag,song_audio,song_rating',
-      :limit => -1,
+      :limit => 20,
       :library => 'all',
       :keyword => value,
       :sort_by => 'title',
