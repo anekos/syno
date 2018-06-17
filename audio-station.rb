@@ -99,7 +99,6 @@ AliasCommand.new(:repeat , %w[all one none], help: 'repeat [all|one|none]')
 AliasCommand.new(:shuffle , %w[true false], help: 'shuffle [true|false]')
 AliasCommand.new(:status , 0)
 AliasCommand.new(:stop , 0)
-AliasCommand.new(:toggle , 0)
 AliasCommand.new(:update_playlist , 1)
 
 AliasCommand.new([:playlist, :pl], 0..1) do
@@ -111,12 +110,16 @@ AliasCommand.new([:playlist, :pl], 0..1) do
     a = song['additional']
     mark = i == current ? '→' : ''
     parts = ["%#{digits}s %2.d %s" % [mark, i + 1, song['title']]]
-    if a and tag = a['song_tag']
-      parts << tag['artist'] || tag('album_artist') || Blank
-      parts << tag['album'] || Blank
-    end
-    if a and rating = a.dig('song_rating', 'rating')
-      parts << ' ★' * rating.to_i
+    if a
+      if tag = a['song_tag']
+        parts << tag['artist'] || tag('album_artist') || Blank
+        parts << tag['album'] || Blank
+      end
+      if rating = a.dig('song_rating', 'rating') and 0 < rating
+        parts << ' ★' * rating.to_i
+      else
+        parts << '-'
+      end
     end
     puts(parts.join(' ／ '))
   end
@@ -199,6 +202,18 @@ end
 StandardCommand.new(:help, 0) do
   |this, syno, args|
   Command.help
+end
+
+StandardCommand.new([:toggle], 0) do
+  |this, syno, args|
+  current = syno.audio_station.status
+
+  case current.dig('data', 'state')
+  when 'playing'
+    syno.audio_station.pause
+  when 'pause', 'none'
+    syno.audio_station.play
+  end
 end
 # }}}
 
