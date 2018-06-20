@@ -40,8 +40,8 @@ Syno.new do
 
     if song and additional = song.dig('additional')
       current.merge!({
-        :album =>  additional.dig('album'),
-        :artist => additional.dig('artist') || additional.dig('song_tag', 'album_artist'),
+        :album =>  additional.dig('song_tag', 'album'),
+        :artist => additional.dig('song_tag', 'artist') || additional.dig('song_tag', 'album_artist'),
         :title => song.dig('title'),
         :duration => additional.dig('song_audio', 'duration').to_time,
       })
