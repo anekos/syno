@@ -124,7 +124,7 @@ class AudioStation
     )
   end
 
-  def playlist_add_album(album, artist)
+  def playlist_add_album(album)
     API.new(
       name: 'AudioStation',
       cgi: 'remote_player',
@@ -239,7 +239,26 @@ class AudioStation
     control(action: 'stop')
   end
 
+  def clear_playlist(limit = nil)
+    limit = self.playlist.dig('data', 'songs').size unless limit
+    API.new(
+      name: 'AudioStation',
+      cgi: 'remote_player',
+      api: 'SYNO.AudioStation.RemotePlayer',
+      version: 3,
+      method: 'updateplaylist',
+      token: true
+    ).post(
+      :id => '__SYNO_USB_PLAYER__',
+      :offset => 0,
+      :songs => '',
+      :limit => limit,
+      :updated_index => -1,
+    )
+  end
+
   def update_playlist(name)
+    self.clear_playlist()
     API.new(
       name: 'AudioStation',
       cgi: 'remote_player',
@@ -254,7 +273,7 @@ class AudioStation
       :library => 'shared',
       :offset => 0,
       :play => true,
-      :limit => 165,
+      :limit => 8192,
     )
   end
 

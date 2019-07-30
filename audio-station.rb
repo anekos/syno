@@ -100,7 +100,8 @@ AliasCommand.new(:repeat , %w[all one none], help: 'repeat [all|one|none]')
 AliasCommand.new(:shuffle , %w[true false], help: 'shuffle [true|false]')
 AliasCommand.new(:status , 0)
 AliasCommand.new(:stop , 0)
-AliasCommand.new(:update_playlist , 1)
+AliasCommand.new([:update_playlist, :set] , 1, help: '(playlist_set|set) <playlist_name>')
+AliasCommand.new([:clear_playlist, :clear] , 0)
 
 AliasCommand.new([:playlist, :pl], 0..1) do
   |data|
@@ -168,7 +169,7 @@ AliasCommand.new([:search, :find], 1) do
   end
 end
 
-AliasCommand.new([:playlist_add, :pa], 1..2)
+AliasCommand.new([:playlist_add, :add], 1..2, help: 'playlist_add|add <ID_OR_ARTIST> [<ALBUM>]')
 
 StandardCommand.new([:call], 0..10000) do
   |this, syno, args|
