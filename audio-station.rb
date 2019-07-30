@@ -107,6 +107,7 @@ AliasCommand.new([:playlist, :pl], 0..1) do
   |data|
   songs = data['songs']
   current = data['current']
+  next if songs.size == 0
   digits = Math.log(songs.size, 10).to_i + 1
   songs.each_with_index do |song, i|
     a = song['additional']
