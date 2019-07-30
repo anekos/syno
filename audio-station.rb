@@ -4,6 +4,7 @@
 # Libs {{{
 require 'yaml'
 require 'readline'
+require 'optparse'
 load './lib/syno.rb'
 # }}}
 
@@ -68,7 +69,7 @@ class Command
 end
 
 class AliasCommand < Command
-  def run(syno, args)
+  def run(syno, args, options = nil)
     validate(args)
 
     result = syno.audio_station.__send__(@name, *args)
@@ -82,8 +83,8 @@ class AliasCommand < Command
 end
 
 class StandardCommand < AliasCommand
-  def run(syno, args)
-    @main.call(self, syno, *args)
+  def run(syno, args, options = nil)
+    @main.call(self, syno, args, options)
   end
 end
 # }}}
@@ -169,8 +170,14 @@ end
 
 AliasCommand.new([:playlist_add, :pa], 1..2)
 
-StandardCommand.new([:playlist_add_from_search_result, :pa], 1..10000) do
-  |this, syno, *lines|
+StandardCommand.new([:call], 0..10000) do
+  |this, syno, args|
+  name = args.shift
+  puts syno.audio_station.__send__(name, args).to_json
+end
+
+StandardCommand.new([:playlist_add_from_search_result, :sr], 1..10000) do
+  |this, syno, lines|
   lines.map do
     |line|
     line = line.dup
@@ -194,18 +201,18 @@ AliasCommand.new([:playlist_add_artist, :artist, :ar], 1)
 AliasCommand.new([:playlist_add_song, :song, :so], 1)
 
 StandardCommand.new(:play, 0..1, help: 'play [<TRACK_NUMBER>]') do
-  |this, syno, index|
+  |this, syno, (index)|
   index = index.to_i - 1 if index
   this.check_result(syno.audio_station.play(index))
 end
 
 StandardCommand.new(:help, 0) do
-  |this, syno, args|
+  |this, syno, _args|
   Command.help
 end
 
 StandardCommand.new([:toggle], 0) do
-  |this, syno, args|
+  |this, syno, _args|
   current = syno.audio_station.status
 
   case current.dig('data', 'state')
@@ -237,6 +244,12 @@ class App
 end
 # }}}
 
+# Options {{{
+class Options < Struct.new(:format)
+end
+
+# }}}
+
 # Main {{{
 Syno.new do
   |syno|
@@ -252,6 +265,13 @@ Syno.new do
       end
     end
   else
+
+    OptionParser.new do |opt|
+      opt.banner = "Usage: #{$0} [options]"
+      opt.on('-f', '--format', 'Format') {|v| @format = v }
+      opt.parse!(ARGV)
+    end
+
     app.request(ARGV.dup)
   end
 end
