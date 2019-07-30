@@ -1,8 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    curb (0.9.6)
-    dotenv (2.4.0)
+    curb (0.9.7)
+    dotenv (2.6.0)
 
 PLATFORMS
   ruby
